@@ -37,7 +37,7 @@ public class BasicItemController {
 
     //상품 상세 조회
     @GetMapping("/{itemId}")
-    public String item(@PathVariable long itemId, Model model){
+    public String item(@PathVariable Long itemId, Model model){
 
         Item item = itemRepository.findById(itemId); //id 값으로 item 객체 생성.
         model.addAttribute("item", item); //모델에 item 객체 저장.
@@ -69,6 +69,28 @@ public class BasicItemController {
 
         return "basic/item";
     }
+
+    //상품 수정 화면 출력
+    @GetMapping("/{itemId}/edit") // GET 경로에 있는 변수명과 @PathVariable의 변수명이 같아야 함.
+    public String viewEditForm(@PathVariable Long itemId, Model model){
+
+        Item item = itemRepository.findById(itemId);
+        model.addAttribute("item", item);
+
+        return "basic/editForm";
+    }
+
+    //상품 수정
+    @PostMapping("/{itemId}/edit")
+    public String edit(@PathVariable long itemId, @ModelAttribute Item editItem){
+
+        itemRepository.update(itemId, editItem);
+
+        //redirect를 하면 /basic/items/{itemId}/edit 경로가 아닌 아래의 경로로 다시 재요청된다.
+        return "redirect:/basic/items/{itemId}"; //{itemId}값의 @PathVariable 값으로 들어간다.
+
+    }
+
 
 
     /**
