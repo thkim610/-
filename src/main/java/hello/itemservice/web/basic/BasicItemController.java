@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -48,6 +46,13 @@ public class BasicItemController {
         return "basic/item";
 
     }
+
+    //상품 등록 화면 출력
+    @GetMapping("/add")
+    public String viewAddForm(){
+        return "basic/addForm";
+    }
+
 
     /**
      * 테스트용 데이터 추가
