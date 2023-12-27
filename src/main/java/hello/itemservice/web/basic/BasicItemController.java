@@ -3,7 +3,6 @@ package hello.itemservice.web.basic;
 import hello.itemservice.domain.Item;
 import hello.itemservice.domain.ItemRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -51,6 +50,24 @@ public class BasicItemController {
     @GetMapping("/add")
     public String viewAddForm(){
         return "basic/addForm";
+    }
+
+    //상품 등록
+    @PostMapping("/add")
+    //@ModelAttribute의 name 속성을 생략했을 때 : 클래스명에서 첫글자만 소문자로 바꾼이름(Item -> item)으로 모델 객체를 만든다.
+    public String save(@ModelAttribute("item") Item item, Model model){
+        /*
+        @ModelAttribute를 사용하면 아래의 모델 객체 생성 과정을 다 처리해준다.
+         Item item = new Item();
+         item.setItemName(itemName);
+         item.setPrice(price);
+         item.setQuantity(quantity);
+        */
+
+        itemRepository.save(item);
+        //model.addAttribute("item", item); //@ModelAttribute는 name 속성으로 지정한 이름("item")으로 모델에 객체를 저장한다.
+
+        return "basic/item";
     }
 
 
