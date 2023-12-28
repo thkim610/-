@@ -69,7 +69,8 @@ public class BasicItemController {
 
         //return "basic/item"; //새로고침을 통해 바로 뷰 템플릿으로 넘어가면 계속 POST 호출이 되어 중복으로 등록되게 된다.
 
-        //새로 고침 문제를 해결하기 위해 상품 저장 후에 뷰 템플릿으로 이동하는 것이 아니라, 상품 상세 화면으로 리다이렉트를 호출.
+        //새로 고침 문제를 해결하기 위해 상품 저장 후에 상품 상세 화면으로 리다이렉트를 호출.(GET으로 재호출)
+        /* PRG Post/Redirect/Get 해결 방식 */
         return "redirect:/basic/items" + item.getId();
     }
 
