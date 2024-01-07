@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Controller
@@ -22,7 +21,7 @@ import java.util.List;
     => 생성자 주입 방식 (DI)
  */
 @RequiredArgsConstructor
-public class BasicItemController {
+public class FormItemController {
 
     private final ItemRepository itemRepository;
 
