@@ -48,7 +48,13 @@ public class FormItemController {
 
     //상품 등록 화면 출력
     @GetMapping("/add")
-    public String viewAddForm(){
+    public String viewAddForm(Model model){
+        /*
+        타임리프에서 th:object를 적용하려면 먼저 해당 오브젝트 정보를 넘겨주어야 한다.
+        따라서, 빈 객체를 만들어서 뷰에 전달한다.
+         */
+        model.addAttribute("item", new Item()); // 빈 item 객체 저장.
+
         return "basic/addForm";
     }
 
