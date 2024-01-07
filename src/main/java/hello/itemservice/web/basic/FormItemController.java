@@ -9,7 +9,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -26,6 +28,17 @@ import java.util.List;
 public class FormItemController {
 
     private final ItemRepository itemRepository;
+
+    @ModelAttribute("regions") //이 컨트롤러를 호출할 때 자동으로 이 ModelAttribute의 데이터를 모델에 담아준다.
+    public Map<String, String> regions(){
+        //지역 데이터를 넘기기 위한 map 생성
+        Map<String, String> regions = new LinkedHashMap<>(); //순서를 보장하기 위해 LinkedHashMap 사용.
+        regions.put("SEOUL","서울");
+        regions.put("BUSAN","부산");
+        regions.put("JEJU","제주");
+
+        return regions; // model.addAttribute("regions", regions);
+    }
 
     //상품 목록 조회
     @GetMapping
@@ -74,6 +87,7 @@ public class FormItemController {
         */
 
         log.info("item.open={}", item.getOpen());
+        log.info("item.regions={}", item.getRegions());
 
         Item savedItem = itemRepository.save(item);
         //model.addAttribute("item", item); //@ModelAttribute는 name 속성으로 지정한 이름("item")으로 모델에 객체를 저장한다.
