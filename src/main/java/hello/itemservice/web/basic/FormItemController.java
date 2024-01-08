@@ -2,6 +2,7 @@ package hello.itemservice.web.basic;
 
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
+import hello.itemservice.domain.item.ItemType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -29,6 +30,7 @@ public class FormItemController {
 
     private final ItemRepository itemRepository;
 
+    //지역 데이터 생성
     @ModelAttribute("regions") //이 컨트롤러를 호출할 때 자동으로 이 ModelAttribute의 데이터를 모델에 담아준다.
     public Map<String, String> regions(){
         //지역 데이터를 넘기기 위한 map 생성
@@ -38,6 +40,13 @@ public class FormItemController {
         regions.put("JEJU","제주");
 
         return regions; // model.addAttribute("regions", regions);
+    }
+
+    //상품 유형 데이터 생성
+    @ModelAttribute("itemTypes")
+    public ItemType[] itemTypes(){
+
+        return ItemType.values();// enum으로 생성한 value(Book, Food, ETC)가 배열로 넘어온다.
     }
 
     //상품 목록 조회
