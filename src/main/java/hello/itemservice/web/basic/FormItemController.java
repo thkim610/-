@@ -97,6 +97,7 @@ public class FormItemController {
 
         log.info("item.open={}", item.getOpen());
         log.info("item.regions={}", item.getRegions());
+        log.info("item.itemTypes={}", item.getItemType());
 
         Item savedItem = itemRepository.save(item);
         //model.addAttribute("item", item); //@ModelAttribute는 name 속성으로 지정한 이름("item")으로 모델에 객체를 저장한다.
