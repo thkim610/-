@@ -70,7 +70,7 @@
         <div th:each="type : ${itemTypes}" class="form-check form-check-inline">
             <!-- Enum.name() : enum의 이름 그대로를 반환한다. -->
             <input type="radio" th:field="${item.itemType}" th:value="${type.name()}"
-                   class="form-check-input">
+                   class="form-check-input" disabled>
             <!-- Enum.description : Enum에 선언한 값 (도서, 음식, 기타)-->
             <label th:for="${#ids.prev('itemType')}" th:text="${type.description}"
                    class="form-check-label">
@@ -79,6 +79,17 @@
         </div>
     </div>
 
+    <!-- SELECT -->
+    <div>
+        <div>배송 방식</div>
+        <select th:field="${item.deliveryCode}" class="form-select" disabled>
+            <option value="">==배송 방식 선택==</option>
+            <!-- deliveryCode : FAST, NOMAL, SLOW -->
+            <option th:each="deliveryCode : ${deliveryCodes}" th:value="${deliveryCode.code}"
+                    th:text="${deliveryCode.displayName}">FAST</option>
+        </select>
+    </div>
+    <hr class="my-4">
 
     <div class="row">
         <div class="col">
