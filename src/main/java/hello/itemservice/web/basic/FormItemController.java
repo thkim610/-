@@ -1,9 +1,6 @@
 package hello.itemservice.web.basic;
 
-import hello.itemservice.domain.item.DeliveryCode;
-import hello.itemservice.domain.item.Item;
-import hello.itemservice.domain.item.ItemRepository;
-import hello.itemservice.domain.item.ItemType;
+import hello.itemservice.domain.item.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -32,6 +29,10 @@ public class FormItemController {
 
     private final ItemRepository itemRepository;
 
+    /**
+     * 성능 측면에서 static 클래스로 따로 분리 해보기!!
+     * @return
+     */
     //지역 데이터 생성
     @ModelAttribute("regions") //이 컨트롤러를 호출할 때 자동으로 이 ModelAttribute의 데이터를 모델에 담아준다.
     public Map<String, String> regions(){
