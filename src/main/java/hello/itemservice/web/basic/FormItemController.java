@@ -1,5 +1,6 @@
 package hello.itemservice.web.basic;
 
+import hello.itemservice.domain.item.DeliveryCode;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import hello.itemservice.domain.item.ItemType;
@@ -10,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,17 @@ public class FormItemController {
     public ItemType[] itemTypes(){
 
         return ItemType.values();// enum으로 생성한 value(Book, Food, ETC)가 배열로 넘어온다.
+    }
+
+    //배송 방식 데이터 생성
+    @ModelAttribute("deliveryCodes")
+    public List<DeliveryCode> deliveryCodes(){
+        List<DeliveryCode> deliveryCodes = new ArrayList<>();
+        deliveryCodes.add(new DeliveryCode("FAST", "빠른 배송"));
+        deliveryCodes.add(new DeliveryCode("NOMAL", "보통 배송"));
+        deliveryCodes.add(new DeliveryCode("SLOW", "느린 배송"));
+
+        return deliveryCodes;
     }
 
     //상품 목록 조회
