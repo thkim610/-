@@ -15,23 +15,28 @@
     <div class="py-5 text-center">
         <h2 th:text="#{page.addItem}">상품 등록 폼</h2>
     </div>
-    <h4 class="mb-3">상품 입력</h4>
+    <h4 class="mb-3" th:text="#{label.item}">상품 입력</h4>
     <!-- 같은 url에서 method만 다를 경우 action에 경로를 생략할 수 있다. -->
     <!-- 폼의 값이 서버로 전송될 때, 요소의 name으로 입력한 값이 넘어간다. -->
     <form action="item.html" th:action th:object="${item}" method="post">
         <div>
             <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
             <!-- th:field => 태그 속성 중 name, id, value를 자동으로 생성해준다.-->
-            <input type="text" id="itemName" th:field="*{itemName}" class="form-control" placeholder="이름을 입력하세요">
+            <input type="text" id="itemName" th:field="*{itemName}" class="form-control"
+                   th:placeholder="#{input.itemName}"
+                   placeholder="이름을 입력하세요">
         </div>
         <div>
             <label for="price" th:text="#{label.item.price}">가격</label>
             <input type="text" id="price" th:field="*{price}" class="form-control"
+                   th:placeholder="#{input.price}"
                    placeholder="가격을 입력하세요">
         </div>
         <div>
             <label for="quantity" th:text="#{label.item.quantity}">수량</label>
-            <input type="text" id="quantity" th:field="*{quantity}" class="form-control" placeholder="수량을 입력하세요">
+            <input type="text" id="quantity" th:field="*{quantity}" class="form-control"
+                   th:placeholder="#{input.quantity}"
+                   placeholder="수량을 입력하세요">
         </div>
 
         <hr class="my-4">
@@ -40,7 +45,7 @@
         <div>
             <div class="form-check">
                 <input type="checkbox" id="open" th:field="*{open}" class="form-check-input">
-                <label for="open" class="form-check-label">판매 오픈</label>
+                <label for="open" th:text="#{item.check.open}" class="form-check-label">판매 오픈</label>
             </div>
         </div>
 
@@ -74,8 +79,8 @@
         <div>
             <div th:text="#{label.item.deliveryCode}">배송 방식</div>
             <select th:field="*{deliveryCode}" class="form-select">
-                <option value="">==배송 방식 선택==</option>
-                <!-- deliveryCode : FAST, NOMAL, SLOW -->
+                <option value="" th:text="#{item.deliveryCode}">==배송 방식 선택==</option>
+                <!-- deliveryCode : FAST, NORMAL, SLOW -->
                 <option th:each="deliveryCode : ${deliveryCodes}" th:value="${deliveryCode.code}"
                         th:text="${deliveryCode.displayName}">FAST</option>
             </select>

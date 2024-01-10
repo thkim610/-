@@ -38,9 +38,9 @@ public class FormItemController {
     public Map<String, String> regions(){
         //지역 데이터를 넘기기 위한 map 생성
         Map<String, String> regions = new LinkedHashMap<>(); //순서를 보장하기 위해 LinkedHashMap 사용.
-        regions.put("SEOUL","서울");
-        regions.put("BUSAN","부산");
-        regions.put("JEJU","제주");
+        regions.put("SEOUL","서울(SEOUL)");
+        regions.put("BUSAN","부산(BUSAN)");
+        regions.put("JEJU","제주(JEJU)");
 
         return regions; // model.addAttribute("regions", regions);
     }
@@ -56,9 +56,9 @@ public class FormItemController {
     @ModelAttribute("deliveryCodes")
     public List<DeliveryCode> deliveryCodes(){
         List<DeliveryCode> deliveryCodes = new ArrayList<>();
-        deliveryCodes.add(new DeliveryCode("FAST", "빠른 배송"));
-        deliveryCodes.add(new DeliveryCode("NOMAL", "보통 배송"));
-        deliveryCodes.add(new DeliveryCode("SLOW", "느린 배송"));
+        deliveryCodes.add(new DeliveryCode("FAST", "빠른 배송(Fast)"));
+        deliveryCodes.add(new DeliveryCode("NORMAL", "보통 배송(Normal)"));
+        deliveryCodes.add(new DeliveryCode("SLOW", "느린 배송(Slow)"));
 
         return deliveryCodes;
     }
