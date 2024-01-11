@@ -5,13 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -100,7 +98,42 @@ public class FormItemController {
     @PostMapping("/add")
     //@ModelAttribute의 name 속성을 생략했을 때 : 클래스명에서 첫글자만 소문자로 바꾼이름(Item -> item)으로 모델 객체를 만든다.
     //RedirectAttributes : 리다이렉트와 관련된 속성을 넣는 인터페이스
-    public String save(@ModelAttribute("item") Item item, RedirectAttributes redirectAttributes){
+    public String save(@ModelAttribute("item") Item item, RedirectAttributes redirectAttributes, Model model){
+        /* item 값이 잘 들어오는지 검증. */
+        //검증 오류 결과를 보관 - 만약 검증시 오류가 발생하면 어떤 검증에서 오류가 발생했는지 정보를 담아둔다.
+        Map<String, String> errors = new HashMap<>();
+
+        //검증 로직
+        //1. 상품명에 글자가 없을 때
+        if(!StringUtils.hasText(item.getItemName())){
+            errors.put("itemName", "상품 이름은 필수입니다.");
+        }
+        //2. 가격이 null이거나 1000원보다 작거나 1000000원보다 클 때
+        if(item.getPrice()==null || item.getPrice() < 1000 || item.getPrice() > 1000000){
+            errors.put("price", "가격은 1,000 ~ 1,000,000원까지 허용합니다.");
+        }
+        //3. 수량이 null이거나 9999개보다 클 때
+        if(item.getQuantity()==null || item.getQuantity() > 9999){
+            errors.put("quantity", "수량은 0 ~ 9,999개까지 허용합니다.");
+        }
+        //특정 필드가 아닌 복합 룰 검증(global errors)
+        //4. 가격과 수량이 null이 아니고 가격*수량이 10000원 이하일 때
+        if(item.getPrice()!=null && item.getQuantity()!=null){
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if(resultPrice < 10000){
+                errors.put("globalError", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice);
+            }
+        }
+        //검증에 실패 -> 다시 입력 폼으로 이동.
+        if(!errors.isEmpty()){
+            log.info("errors = {} ", errors);
+            model.addAttribute("errors", errors);
+
+            return "basic/addForm";
+        }
+
+
+        //검증 성공 로직
         /*
         @ModelAttribute를 사용하면 아래의 모델 객체 생성 과정을 다 처리해준다.
          Item item = new Item();
