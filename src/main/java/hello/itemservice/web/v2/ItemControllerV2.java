@@ -16,7 +16,7 @@ import java.util.*;
 
 @Slf4j
 @Controller
-@RequestMapping("/basic/items")
+@RequestMapping("/v2/items")
 /*
 @RequiredArgsConstructor는 private final 키워드가 붙은 필드의 생성자를 만들어 준다.
 
@@ -71,7 +71,7 @@ public class ItemControllerV2 {
         List<Item> items = itemRepository.findAll();
         model.addAttribute("items", items);
 
-        return "basic/items";
+        return "v2/items";
     }
 
     //상품 상세 조회
@@ -81,7 +81,7 @@ public class ItemControllerV2 {
         Item item = itemRepository.findById(itemId); //id 값으로 item 객체 생성.
         model.addAttribute("item", item); //모델에 item 객체 저장.
 
-        return "basic/item";
+        return "v2/item";
 
     }
 
@@ -94,7 +94,7 @@ public class ItemControllerV2 {
          */
         model.addAttribute("item", new Item()); // 빈 item 객체 저장.
 
-        return "basic/addForm";
+        return "v2/addForm";
     }
 
     //상품 등록
@@ -132,7 +132,7 @@ public class ItemControllerV2 {
             log.info("errors = {} ", errors);
             model.addAttribute("errors", errors);
 
-            return "basic/addForm";
+            return "v2/addForm";
         }
 
 
@@ -155,11 +155,11 @@ public class ItemControllerV2 {
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true); // 저장이 완료되었을 때 상태
 
-        //return "basic/item"; //새로고침을 통해 바로 뷰 템플릿으로 넘어가면 계속 POST 호출이 되어 중복으로 등록되게 된다.
+        //return "v2/item"; //새로고침을 통해 바로 뷰 템플릿으로 넘어가면 계속 POST 호출이 되어 중복으로 등록되게 된다.
 
         //새로 고침 문제를 해결하기 위해 상품 저장 후에 상품 상세 화면으로 리다이렉트를 호출.(GET으로 재호출)
         /* PRG Post/Redirect/Get 해결 방식 */
-        return "redirect:/basic/items/{itemId}";
+        return "redirect:/v2/items/{itemId}";
     }
 
     //상품 수정 화면 출력
@@ -169,7 +169,7 @@ public class ItemControllerV2 {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
 
-        return "basic/editForm";
+        return "v2/editForm";
     }
 
     //상품 수정
@@ -178,8 +178,8 @@ public class ItemControllerV2 {
 
         itemRepository.update(itemId, editItem);
 
-        //redirect를 하면 /basic/items/{itemId}/edit 경로가 아닌 아래의 경로로 다시 재요청된다.
-        return "redirect:/basic/items/{itemId}"; //{itemId}값의 @PathVariable 값으로 들어간다.
+        //redirect를 하면 /v2/items/{itemId}/edit 경로가 아닌 아래의 경로로 다시 재요청된다.
+        return "redirect:/v2/items/{itemId}"; //{itemId}값의 @PathVariable 값으로 들어간다.
 
     }
 
