@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -101,37 +104,38 @@ public class ItemControllerV2 {
     @PostMapping("/add")
     //@ModelAttribute의 name 속성을 생략했을 때 : 클래스명에서 첫글자만 소문자로 바꾼이름(Item -> item)으로 모델 객체를 만든다.
     //RedirectAttributes : 리다이렉트와 관련된 속성을 넣는 인터페이스
-    public String save(@ModelAttribute("item") Item item, RedirectAttributes redirectAttributes, Model model){
+    // 순서 주의 !! => BindingResult는 @ModelAttribute 바로 다음에 넣어주어야 한다. -> item 객체의 바인딩 결과를 담고 있기 때문에
+    public String save(@ModelAttribute("item") Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model){
         /* item 값이 잘 들어오는지 검증. */
-        //검증 오류 결과를 보관 - 만약 검증시 오류가 발생하면 어떤 검증에서 오류가 발생했는지 정보를 담아둔다.
-        Map<String, String> errors = new HashMap<>();
+        /**Binding Result : 자동으로 view에 에러에 대한 정보를 넘겨준다.
+         * 따라서, model에 에러 객체를 따로 담을 필요가 없다. (스프링이 자동으로 처리해준다.)
+         */
 
         //검증 로직
         //1. 상품명에 글자가 없을 때
         if(!StringUtils.hasText(item.getItemName())){
-            errors.put("itemName", "상품 이름은 필수입니다.");
+            //FieldError(객체명, 필드명, 기본메시지)
+            bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수입니다."));
         }
         //2. 가격이 null이거나 1000원보다 작거나 1000000원보다 클 때
         if(item.getPrice()==null || item.getPrice() < 1000 || item.getPrice() > 1000000){
-            errors.put("price", "가격은 1,000 ~ 1,000,000원까지 허용합니다.");
+            bindingResult.addError(new FieldError("item", "price", "가격은 1,000 ~ 1,000,000원까지 허용합니다."));
         }
         //3. 수량이 null이거나 9999개보다 클 때
         if(item.getQuantity()==null || item.getQuantity() > 9999){
-            errors.put("quantity", "수량은 0 ~ 9,999개까지 허용합니다.");
+            bindingResult.addError(new FieldError("item", "quantity", "수량은 0 ~ 9,999개까지 허용합니다."));
         }
         //특정 필드가 아닌 복합 룰 검증(global errors)
         //4. 가격과 수량이 null이 아니고 가격*수량이 10000원 이하일 때
         if(item.getPrice()!=null && item.getQuantity()!=null){
             int resultPrice = item.getPrice() * item.getQuantity();
             if(resultPrice < 10000){
-                errors.put("globalError", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice);
+                bindingResult.addError(new ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
             }
         }
         //검증에 실패 -> 다시 입력 폼으로 이동.
-        if(!errors.isEmpty()){
-            log.info("errors = {} ", errors);
-            model.addAttribute("errors", errors);
-
+        if(bindingResult.hasErrors()){
+            log.info("errors = {} ", bindingResult);
             return "v2/addForm";
         }
 
