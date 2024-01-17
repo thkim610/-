@@ -109,28 +109,40 @@ public class ItemControllerV2 {
         /* item 값이 잘 들어오는지 검증. */
         /**Binding Result : 자동으로 view에 에러에 대한 정보를 넘겨준다.
          * 따라서, model에 에러 객체를 따로 담을 필요가 없다. (스프링이 자동으로 처리해준다.)
+         *
+         * FieldError(objectName, field, rejectedValue, bindingFailure, codes, arguments, defaultMessage)
+         * objectName : 오류가 발생한 객체 이름
+         * field : 오류 필드
+         * rejectedValue : 사용자가 입력한 값(거절된 값)
+         * bindingFailure : 타입 오류 같은 바인딩 실패인지, 검증 실패인지 구분 값
+         * codes : 메시지 코드
+         * arguments : 메시지에서 사용하는 인자
+         * defaultMessage : 기본 오류 메시지
          */
 
         //검증 로직
         //1. 상품명에 글자가 없을 때
         if(!StringUtils.hasText(item.getItemName())){
             //FieldError(객체명, 필드명, 기본메시지)
-            bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수입니다."));
+            bindingResult.addError(new FieldError("item", "itemName",
+                    item.getItemName(), false, null, null, "상품 이름은 필수입니다."));
         }
         //2. 가격이 null이거나 1000원보다 작거나 1000000원보다 클 때
         if(item.getPrice()==null || item.getPrice() < 1000 || item.getPrice() > 1000000){
-            bindingResult.addError(new FieldError("item", "price", "가격은 1,000 ~ 1,000,000원까지 허용합니다."));
+            bindingResult.addError(new FieldError("item", "price",
+                    item.getPrice(), false, null, null, "가격은 1,000 ~ 1,000,000원까지 허용합니다."));
         }
         //3. 수량이 null이거나 9999개보다 클 때
         if(item.getQuantity()==null || item.getQuantity() > 9999){
-            bindingResult.addError(new FieldError("item", "quantity", "수량은 0 ~ 9,999개까지 허용합니다."));
+            bindingResult.addError(new FieldError("item", "quantity",
+                    item.getQuantity(), false, null, null, "수량은 0 ~ 9,999개까지 허용합니다."));
         }
         //특정 필드가 아닌 복합 룰 검증(global errors)
         //4. 가격과 수량이 null이 아니고 가격*수량이 10000원 이하일 때
         if(item.getPrice()!=null && item.getQuantity()!=null){
             int resultPrice = item.getPrice() * item.getQuantity();
             if(resultPrice < 10000){
-                bindingResult.addError(new ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
+                bindingResult.addError(new ObjectError("item", null, null, "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
             }
         }
         //검증에 실패 -> 다시 입력 폼으로 이동.
