@@ -125,24 +125,24 @@ public class ItemControllerV2 {
         if(!StringUtils.hasText(item.getItemName())){
             //FieldError(객체명, 필드명, 기본메시지)
             bindingResult.addError(new FieldError("item", "itemName",
-                    item.getItemName(), false, null, null, "상품 이름은 필수입니다."));
+                    item.getItemName(), false, new String[]{"required.item.itemName"}, null, null ));
         }
         //2. 가격이 null이거나 1000원보다 작거나 1000000원보다 클 때
         if(item.getPrice()==null || item.getPrice() < 1000 || item.getPrice() > 1000000){
             bindingResult.addError(new FieldError("item", "price",
-                    item.getPrice(), false, null, null, "가격은 1,000 ~ 1,000,000원까지 허용합니다."));
+                    item.getPrice(), false, new String[]{"range.item.price"}, null, null));
         }
         //3. 수량이 null이거나 9999개보다 클 때
         if(item.getQuantity()==null || item.getQuantity() > 9999){
             bindingResult.addError(new FieldError("item", "quantity",
-                    item.getQuantity(), false, null, null, "수량은 0 ~ 9,999개까지 허용합니다."));
+                    item.getQuantity(), false, new String[]{"max.item.quantity"}, null, null));
         }
         //특정 필드가 아닌 복합 룰 검증(global errors)
         //4. 가격과 수량이 null이 아니고 가격*수량이 10000원 이하일 때
         if(item.getPrice()!=null && item.getQuantity()!=null){
             int resultPrice = item.getPrice() * item.getQuantity();
             if(resultPrice < 10000){
-                bindingResult.addError(new ObjectError("item", null, null, "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
+                bindingResult.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice}, null));
             }
         }
         //검증에 실패 -> 다시 입력 폼으로 이동.
