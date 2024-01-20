@@ -4,14 +4,13 @@ import hello.itemservice.domain.item.DeliveryCode;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import hello.itemservice.domain.item.ItemType;
+import hello.itemservice.web.ItemValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -32,6 +31,8 @@ import java.util.*;
 public class ItemControllerV2 {
 
     private final ItemRepository itemRepository;
+    private final ItemValidator itemValidator;
+
 
     /**
      * 성능 측면에서 static 클래스로 따로 분리 해보기!!
@@ -106,72 +107,26 @@ public class ItemControllerV2 {
     //RedirectAttributes : 리다이렉트와 관련된 속성을 넣는 인터페이스
     // 순서 주의 !! => BindingResult는 @ModelAttribute 바로 다음에 넣어주어야 한다. -> item 객체의 바인딩 결과를 담고 있기 때문에
     public String save(@ModelAttribute("item") Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model){
-        /* item 값이 잘 들어오는지 검증. */
-        /**Binding Result : 자동으로 view에 에러에 대한 정보를 넘겨준다.
+        /** Binding Result : 자동으로 view에 에러에 대한 정보를 넘겨준다.
          * 따라서, model에 에러 객체를 따로 담을 필요가 없다. (스프링이 자동으로 처리해준다.)
-         *
-         * FieldError(objectName, field, rejectedValue, bindingFailure, codes, arguments, defaultMessage)
-         * objectName : 오류가 발생한 객체 이름
-         * field : 오류 필드
-         * rejectedValue : 사용자가 입력한 값(거절된 값)
-         * bindingFailure : 타입 오류 같은 바인딩 실패인지, 검증 실패인지 구분 값
-         * codes : 메시지 코드
-         * arguments : 메시지에서 사용하는 인자
-         * defaultMessage : 기본 오류 메시지
-         */
+         **/
+        itemValidator.validate(item, bindingResult);
 
-        //검증 로직
-        //1. 상품명에 글자가 없을 때
-        if(!StringUtils.hasText(item.getItemName())){
-            //FieldError(객체명, 필드명, 기본메시지)
-            bindingResult.addError(new FieldError("item", "itemName",
-                    item.getItemName(), false, new String[]{"required.item.itemName"}, null, null ));
-        }
-        //2. 가격이 null이거나 1000원보다 작거나 1000000원보다 클 때
-        if(item.getPrice()==null || item.getPrice() < 1000 || item.getPrice() > 1000000){
-            bindingResult.addError(new FieldError("item", "price",
-                    item.getPrice(), false, new String[]{"range.item.price"}, null, null));
-        }
-        //3. 수량이 null이거나 9999개보다 클 때
-        if(item.getQuantity()==null || item.getQuantity() > 9999){
-            bindingResult.addError(new FieldError("item", "quantity",
-                    item.getQuantity(), false, new String[]{"max.item.quantity"}, null, null));
-        }
-        //특정 필드가 아닌 복합 룰 검증(global errors)
-        //4. 가격과 수량이 null이 아니고 가격*수량이 10000원 이하일 때
-        if(item.getPrice()!=null && item.getQuantity()!=null){
-            int resultPrice = item.getPrice() * item.getQuantity();
-            if(resultPrice < 10000){
-                bindingResult.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice}, null));
-            }
-        }
         //검증에 실패 -> 다시 입력 폼으로 이동.
         if(bindingResult.hasErrors()){
             log.info("errors = {} ", bindingResult);
             return "v2/addForm";
         }
 
-
         //검증 성공 로직
-        /*
-        @ModelAttribute를 사용하면 아래의 모델 객체 생성 과정을 다 처리해준다.
-         Item item = new Item();
-         item.setItemName(itemName);
-         item.setPrice(price);
-         item.setQuantity(quantity);
-        */
-
         log.info("item.open={}", item.getOpen());
         log.info("item.regions={}", item.getRegions());
         log.info("item.itemTypes={}", item.getItemType());
 
         Item savedItem = itemRepository.save(item);
-        //model.addAttribute("item", item); //@ModelAttribute는 name 속성으로 지정한 이름("item")으로 모델에 객체를 저장한다.
 
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true); // 저장이 완료되었을 때 상태
-
-        //return "v2/item"; //새로고침을 통해 바로 뷰 템플릿으로 넘어가면 계속 POST 호출이 되어 중복으로 등록되게 된다.
 
         //새로 고침 문제를 해결하기 위해 상품 저장 후에 상품 상세 화면으로 리다이렉트를 호출.(GET으로 재호출)
         /* PRG Post/Redirect/Get 해결 방식 */
