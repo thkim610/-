@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -33,6 +34,12 @@ public class ItemControllerV2 {
     private final ItemRepository itemRepository;
     private final ItemValidator itemValidator;
 
+    //WebDataBinder : 스프링 MVC 내부에서 자동으로 객체에 파라미터를 바인딩, 검증기를 통해 데이터 검증 등의 기능을 수행한다.
+    @InitBinder // : 해당 컨트롤러에만 영향을 준다. 글로벌 설정은 별도로 해야한다.
+    public void init(WebDataBinder dataBinder) {
+        log.info("init binder {}", dataBinder);
+        dataBinder.addValidators(itemValidator);
+    }
 
     /**
      * 성능 측면에서 static 클래스로 따로 분리 해보기!!
@@ -105,12 +112,13 @@ public class ItemControllerV2 {
     @PostMapping("/add")
     //@ModelAttribute의 name 속성을 생략했을 때 : 클래스명에서 첫글자만 소문자로 바꾼이름(Item -> item)으로 모델 객체를 만든다.
     //RedirectAttributes : 리다이렉트와 관련된 속성을 넣는 인터페이스
-    // 순서 주의 !! => BindingResult는 @ModelAttribute 바로 다음에 넣어주어야 한다. -> item 객체의 바인딩 결과를 담고 있기 때문에
-    public String save(@ModelAttribute("item") Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model){
+    //@Validate : 위에 설정한 @InitBinder에 등록된 검증기를 찾아 해당 객체(@ModelAttribute)를 자동으로 검증한다.
+    public String save(@Validated @ModelAttribute("item") Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes){
         /** Binding Result : 자동으로 view에 에러에 대한 정보를 넘겨준다.
          * 따라서, model에 에러 객체를 따로 담을 필요가 없다. (스프링이 자동으로 처리해준다.)
+         * 순서 주의 !! => BindingResult는 @ModelAttribute 바로 다음에 넣어주어야 한다. -> item 객체의 바인딩 결과를 담고 있기 때문에
          **/
-        itemValidator.validate(item, bindingResult);
+        //itemValidator.validate(item, bindingResult);
 
         //검증에 실패 -> 다시 입력 폼으로 이동.
         if(bindingResult.hasErrors()){
