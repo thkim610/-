@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range; //hibernate.validator에서만 동작.
+import org.hibernate.validator.constraints.ScriptAssert;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank; //어떤 구현체에서도 동작.(표준)
@@ -20,7 +21,7 @@ public class Item {
 
     private long id;
 
-    @NotBlank
+    @NotBlank(message = "공백 X") // errors.properties에 적용된 것이 없다면, 기본 오류 메시지로 출력됨.
     private String itemName; //상품명
 
     @NotNull
