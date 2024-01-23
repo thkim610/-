@@ -1,9 +1,6 @@
 package hello.itemservice.web.v1;
 
-import hello.itemservice.domain.item.DeliveryCode;
-import hello.itemservice.domain.item.Item;
-import hello.itemservice.domain.item.ItemRepository;
-import hello.itemservice.domain.item.ItemType;
+import hello.itemservice.domain.item.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -99,8 +96,9 @@ public class ItemControllerV3 {
     }
 
     //상품 등록
+    //BeanValidation groups(SaveCheck) : 수정 검증만 적용.
     @PostMapping("/add")
-    public String save(@Validated @ModelAttribute("item") Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes){
+    public String save(@Validated(value = SaveCheck.class) @ModelAttribute("item") Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes){
 
         //검증에 실패 -> 다시 입력 폼으로 이동.
         if(bindingResult.hasErrors()){
@@ -145,8 +143,9 @@ public class ItemControllerV3 {
     }
 
     //상품 수정
+    //BeanValidation groups(UpdateCheck) : 수정 검증만 적용.
     @PostMapping("/{itemId}/edit")
-    public String edit(@PathVariable long itemId, @Validated @ModelAttribute Item item, BindingResult bindingResult){
+    public String edit(@PathVariable long itemId, @Validated(value = UpdateCheck.class) @ModelAttribute Item item, BindingResult bindingResult){
 
         //Bean Validation- ObjectError 처리 방법 2 (직접 자바 코드로 작성 - 권장 O)
         //특정 필드가 아닌 복합 룰 검증(global errors)
