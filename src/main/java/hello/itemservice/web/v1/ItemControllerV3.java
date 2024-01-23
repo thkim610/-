@@ -77,6 +77,8 @@ public class ItemControllerV3 {
     @GetMapping("/{itemId}")
     public String item(@PathVariable Long itemId, Model model){
 
+        log.info("itemId = {}", itemId);
+
         Item item = itemRepository.findById(itemId); //id 값으로 item 객체 생성.
         model.addAttribute("item", item); //모델에 item 객체 저장.
 
@@ -144,9 +146,25 @@ public class ItemControllerV3 {
 
     //상품 수정
     @PostMapping("/{itemId}/edit")
-    public String edit(@PathVariable long itemId, @ModelAttribute Item editItem){
+    public String edit(@PathVariable long itemId, @Validated @ModelAttribute Item item, BindingResult bindingResult){
 
-        itemRepository.update(itemId, editItem);
+        //Bean Validation- ObjectError 처리 방법 2 (직접 자바 코드로 작성 - 권장 O)
+        //특정 필드가 아닌 복합 룰 검증(global errors)
+        //가격과 수량이 null이 아니고 가격*수량이 10000원 이하일 때 (ObjectError)
+        if(item.getPrice()!=null && item.getQuantity()!=null){
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if(resultPrice < 10000){
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+
+        //검증에 실패 -> 다시 입력 폼으로 이동.
+        if(bindingResult.hasErrors()){
+            log.info("errors = {} ", bindingResult);
+            return "v3/editForm";
+        }
+
+        itemRepository.update(itemId, item);
 
         //redirect를 하면 /v3/items/{itemId}/edit 경로가 아닌 아래의 경로로 다시 재요청된다.
         return "redirect:/v3/items/{itemId}"; //{itemId}값의 @PathVariable 값으로 들어간다.
