@@ -17,6 +17,8 @@ import javax.validation.constraints.NotNull; //어떤 구현체에서도 동작.
 import java.util.List;
 
 @Getter @Setter
+//Bean Validation- ObjectError 처리 방법 1 (@ScriptAssert 어노테이션 활용 - 권장X)
+//@ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000", message = "총합이 10000원 넘게 입력해주세요.")
 public class Item {
 
     private long id;

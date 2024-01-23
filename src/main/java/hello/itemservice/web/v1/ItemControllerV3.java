@@ -106,6 +106,17 @@ public class ItemControllerV3 {
             return "v3/addForm";
         }
 
+        //Bean Validation- ObjectError 처리 방법 2 (직접 자바 코드로 작성 - 권장 O)
+        //특정 필드가 아닌 복합 룰 검증(global errors)
+        //가격과 수량이 null이 아니고 가격*수량이 10000원 이하일 때 (ObjectError)
+        if(item.getPrice()!=null && item.getQuantity()!=null){
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if(resultPrice < 10000){
+//                bindingResult.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice}, null));
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+
         //검증 성공 로직
         log.info("item.open={}", item.getOpen());
         log.info("item.regions={}", item.getRegions());

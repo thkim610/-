@@ -59,15 +59,7 @@ public class ItemValidator implements Validator {
 //                    item.getQuantity(), false, new String[]{"max.item.quantity"}, null, null));
             errors.rejectValue("quantity", "max", new Object[]{9999}, null);
         }
-        //특정 필드가 아닌 복합 룰 검증(global errors)
-        //4. 가격과 수량이 null이 아니고 가격*수량이 10000원 이하일 때
-        if(item.getPrice()!=null && item.getQuantity()!=null){
-            int resultPrice = item.getPrice() * item.getQuantity();
-            if(resultPrice < 10000){
-//                bindingResult.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice}, null));
-                errors.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
-            }
-        }
+
 
 
     }
