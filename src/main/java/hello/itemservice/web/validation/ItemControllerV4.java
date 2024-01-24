@@ -1,6 +1,8 @@
 package hello.itemservice.web.validation;
 
 import hello.itemservice.domain.item.*;
+import hello.itemservice.web.validation.form.ItemSaveDto;
+import hello.itemservice.web.validation.form.ItemUpdateDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -98,7 +100,7 @@ public class ItemControllerV4 {
     //상품 등록
     //BeanValidation groups(SaveCheck) : 등록 검증만 적용.
     @PostMapping("/add")
-    public String save(@Validated(value = SaveCheck.class) @ModelAttribute("item") Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes){
+    public String save(@Validated @ModelAttribute("item") ItemSaveDto itemSaveDto, BindingResult bindingResult, RedirectAttributes redirectAttributes){
 
         //검증에 실패 -> 다시 입력 폼으로 이동.
         if(bindingResult.hasErrors()){
@@ -109,8 +111,8 @@ public class ItemControllerV4 {
         //Bean Validation- ObjectError 처리 방법 2 (직접 자바 코드로 작성 - 권장 O)
         //특정 필드가 아닌 복합 룰 검증(global errors)
         //가격과 수량이 null이 아니고 가격*수량이 10000원 이하일 때 (ObjectError)
-        if(item.getPrice()!=null && item.getQuantity()!=null){
-            int resultPrice = item.getPrice() * item.getQuantity();
+        if(itemSaveDto.getPrice()!=null && itemSaveDto.getQuantity()!=null){
+            int resultPrice = itemSaveDto.getPrice() * itemSaveDto.getQuantity();
             if(resultPrice < 10000){
 //                bindingResult.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice}, null));
                 bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
@@ -118,9 +120,11 @@ public class ItemControllerV4 {
         }
 
         //검증 성공 로직
-        log.info("item.open={}", item.getOpen());
-        log.info("item.regions={}", item.getRegions());
-        log.info("item.itemTypes={}", item.getItemType());
+        //Dto를 가지고 item 객체 생성
+        Item item = new Item();
+        item.setItemName(itemSaveDto.getItemName());
+        item.setPrice(itemSaveDto.getPrice());
+        item.setQuantity(itemSaveDto.getQuantity());
 
         Item savedItem = itemRepository.save(item);
 
@@ -145,13 +149,13 @@ public class ItemControllerV4 {
     //상품 수정
     //BeanValidation groups(UpdateCheck) : 수정 검증만 적용.
     @PostMapping("/{itemId}/edit")
-    public String edit(@PathVariable long itemId, @Validated(value = UpdateCheck.class) @ModelAttribute Item item, BindingResult bindingResult){
+    public String edit(@PathVariable long itemId, @Validated @ModelAttribute("item") ItemUpdateDto itemUpdateDto, BindingResult bindingResult){
 
         //Bean Validation- ObjectError 처리 방법 2 (직접 자바 코드로 작성 - 권장 O)
         //특정 필드가 아닌 복합 룰 검증(global errors)
         //가격과 수량이 null이 아니고 가격*수량이 10000원 이하일 때 (ObjectError)
-        if(item.getPrice()!=null && item.getQuantity()!=null){
-            int resultPrice = item.getPrice() * item.getQuantity();
+        if(itemUpdateDto.getPrice()!=null && itemUpdateDto.getQuantity()!=null){
+            int resultPrice = itemUpdateDto.getPrice() * itemUpdateDto.getQuantity();
             if(resultPrice < 10000){
                 bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
@@ -162,6 +166,13 @@ public class ItemControllerV4 {
             log.info("errors = {} ", bindingResult);
             return "v4/editForm";
         }
+
+        //Dto를 가지고 item 객체 생성
+        Item item = new Item();
+        item.setItemName(itemUpdateDto.getItemName());
+        item.setPrice(itemUpdateDto.getPrice());
+        item.setQuantity(itemUpdateDto.getQuantity());
+
 
         itemRepository.update(itemId, item);
 
