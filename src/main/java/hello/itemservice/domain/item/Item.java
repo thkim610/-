@@ -26,18 +26,18 @@ public class Item {
      *  -SaveCheck.class : 상품 등록 폼에서 필요한 검증만 진행.
      */
 
-    @NotNull(groups = UpdateCheck.class)
+//    @NotNull(groups = UpdateCheck.class)
     private long id;
 
-    @NotBlank(groups = {UpdateCheck.class, SaveCheck.class}, message = "공백 X") // errors.properties에 적용된 것이 없다면, 기본 오류 메시지로 출력됨.
+//    @NotBlank(groups = {UpdateCheck.class, SaveCheck.class}, message = "공백 X") // errors.properties에 적용된 것이 없다면, 기본 오류 메시지로 출력됨.
     private String itemName; //상품명
 
-    @NotNull(groups = {UpdateCheck.class, SaveCheck.class})
-    @Range(min = 1000, max = 1000000, groups = {UpdateCheck.class, SaveCheck.class})
+//    @NotNull(groups = {UpdateCheck.class, SaveCheck.class})
+//    @Range(min = 1000, max = 1000000, groups = {UpdateCheck.class, SaveCheck.class})
     private Integer price; //상품가격, Integer를 쓴 이유 : null 값도 들어갈 수 있게 하기 위해서
 
-    @NotNull(groups = {UpdateCheck.class, SaveCheck.class})
-    @Max(value = 9999, groups = SaveCheck.class)
+//    @NotNull(groups = {UpdateCheck.class, SaveCheck.class})
+//    @Max(value = 9999, groups = SaveCheck.class)
     private Integer quantity; //수량
 
     private Boolean open; // 판매 여부 - HTML 폼에서 'on/off' 문자 값으로 넘어오는데 스프링은 이를 true/false로 변환해준다. (스프링 타입 컨버터)
