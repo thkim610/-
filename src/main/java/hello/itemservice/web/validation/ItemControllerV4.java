@@ -1,45 +1,30 @@
-package hello.itemservice.web.v1;
+package hello.itemservice.web.validation;
 
-import hello.itemservice.domain.item.DeliveryCode;
-import hello.itemservice.domain.item.Item;
-import hello.itemservice.domain.item.ItemRepository;
-import hello.itemservice.domain.item.ItemType;
-import hello.itemservice.web.ItemValidator;
+import hello.itemservice.domain.item.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
+/**
+ * Version 3 : 검증 방식을 Bean Validation으로 수정.
+ */
 @Slf4j
 @Controller
-@RequestMapping("/v2/items")
-/*
-@RequiredArgsConstructor는 private final 키워드가 붙은 필드의 생성자를 만들어 준다.
-
-    public BasicItemController(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
-    }
-    => 생성자 주입 방식 (DI)
- */
+@RequestMapping("/v4/items")
 @RequiredArgsConstructor
-public class ItemControllerV2 {
+public class ItemControllerV4 {
 
     private final ItemRepository itemRepository;
-    private final ItemValidator itemValidator;
-
-    //WebDataBinder : 스프링 MVC 내부에서 자동으로 객체에 파라미터를 바인딩, 검증기를 통해 데이터 검증 등의 기능을 수행한다.
-    @InitBinder // : 해당 컨트롤러에만 영향을 준다. 글로벌 설정은 별도로 해야한다.
-    public void init(WebDataBinder dataBinder) {
-        log.info("init binder {}", dataBinder);
-        dataBinder.addValidators(itemValidator);
-    }
 
     /**
      * 성능 측면에서 static 클래스로 따로 분리 해보기!!
@@ -82,17 +67,19 @@ public class ItemControllerV2 {
         List<Item> items = itemRepository.findAll();
         model.addAttribute("items", items);
 
-        return "v2/items";
+        return "v4/items";
     }
 
     //상품 상세 조회
     @GetMapping("/{itemId}")
     public String item(@PathVariable Long itemId, Model model){
 
+        log.info("itemId = {}", itemId);
+
         Item item = itemRepository.findById(itemId); //id 값으로 item 객체 생성.
         model.addAttribute("item", item); //모델에 item 객체 저장.
 
-        return "v2/item";
+        return "v4/item";
 
     }
 
@@ -105,25 +92,29 @@ public class ItemControllerV2 {
          */
         model.addAttribute("item", new Item()); // 빈 item 객체 저장.
 
-        return "v2/addForm";
+        return "v4/addForm";
     }
 
     //상품 등록
+    //BeanValidation groups(SaveCheck) : 등록 검증만 적용.
     @PostMapping("/add")
-    //@ModelAttribute의 name 속성을 생략했을 때 : 클래스명에서 첫글자만 소문자로 바꾼이름(Item -> item)으로 모델 객체를 만든다.
-    //RedirectAttributes : 리다이렉트와 관련된 속성을 넣는 인터페이스
-    //@Validate : 위에 설정한 @InitBinder에 등록된 검증기를 찾아 해당 객체(@ModelAttribute)를 자동으로 검증한다.
-    public String save(@Validated @ModelAttribute("item") Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes){
-        /** Binding Result : 자동으로 view에 에러에 대한 정보를 넘겨준다.
-         * 따라서, model에 에러 객체를 따로 담을 필요가 없다. (스프링이 자동으로 처리해준다.)
-         * 순서 주의 !! => BindingResult는 @ModelAttribute 바로 다음에 넣어주어야 한다. -> item 객체의 바인딩 결과를 담고 있기 때문에
-         **/
-        //itemValidator.validate(item, bindingResult);
+    public String save(@Validated(value = SaveCheck.class) @ModelAttribute("item") Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes){
 
         //검증에 실패 -> 다시 입력 폼으로 이동.
         if(bindingResult.hasErrors()){
             log.info("errors = {} ", bindingResult);
-            return "v2/addForm";
+            return "v4/addForm";
+        }
+
+        //Bean Validation- ObjectError 처리 방법 2 (직접 자바 코드로 작성 - 권장 O)
+        //특정 필드가 아닌 복합 룰 검증(global errors)
+        //가격과 수량이 null이 아니고 가격*수량이 10000원 이하일 때 (ObjectError)
+        if(item.getPrice()!=null && item.getQuantity()!=null){
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if(resultPrice < 10000){
+//                bindingResult.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice}, null));
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
         }
 
         //검증 성공 로직
@@ -138,7 +129,7 @@ public class ItemControllerV2 {
 
         //새로 고침 문제를 해결하기 위해 상품 저장 후에 상품 상세 화면으로 리다이렉트를 호출.(GET으로 재호출)
         /* PRG Post/Redirect/Get 해결 방식 */
-        return "redirect:/v2/items/{itemId}";
+        return "redirect:/v4/items/{itemId}";
     }
 
     //상품 수정 화면 출력
@@ -148,17 +139,34 @@ public class ItemControllerV2 {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
 
-        return "v2/editForm";
+        return "v4/editForm";
     }
 
     //상품 수정
+    //BeanValidation groups(UpdateCheck) : 수정 검증만 적용.
     @PostMapping("/{itemId}/edit")
-    public String edit(@PathVariable long itemId, @ModelAttribute Item editItem){
+    public String edit(@PathVariable long itemId, @Validated(value = UpdateCheck.class) @ModelAttribute Item item, BindingResult bindingResult){
 
-        itemRepository.update(itemId, editItem);
+        //Bean Validation- ObjectError 처리 방법 2 (직접 자바 코드로 작성 - 권장 O)
+        //특정 필드가 아닌 복합 룰 검증(global errors)
+        //가격과 수량이 null이 아니고 가격*수량이 10000원 이하일 때 (ObjectError)
+        if(item.getPrice()!=null && item.getQuantity()!=null){
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if(resultPrice < 10000){
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
 
-        //redirect를 하면 /v2/items/{itemId}/edit 경로가 아닌 아래의 경로로 다시 재요청된다.
-        return "redirect:/v2/items/{itemId}"; //{itemId}값의 @PathVariable 값으로 들어간다.
+        //검증에 실패 -> 다시 입력 폼으로 이동.
+        if(bindingResult.hasErrors()){
+            log.info("errors = {} ", bindingResult);
+            return "v4/editForm";
+        }
+
+        itemRepository.update(itemId, item);
+
+        //redirect를 하면 /v4/items/{itemId}/edit 경로가 아닌 아래의 경로로 다시 재요청된다.
+        return "redirect:/v4/items/{itemId}"; //{itemId}값의 @PathVariable 값으로 들어간다.
 
     }
 

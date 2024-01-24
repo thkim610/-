@@ -1,4 +1,4 @@
-package hello.itemservice.web.v1;
+package hello.itemservice.web.validation;
 
 import hello.itemservice.domain.item.*;
 import lombok.RequiredArgsConstructor;
@@ -96,7 +96,7 @@ public class ItemControllerV3 {
     }
 
     //상품 등록
-    //BeanValidation groups(SaveCheck) : 수정 검증만 적용.
+    //BeanValidation groups(SaveCheck) : 등록 검증만 적용.
     @PostMapping("/add")
     public String save(@Validated(value = SaveCheck.class) @ModelAttribute("item") Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes){
 

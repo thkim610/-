@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+            href="../css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 560px;
+        }
+        .field-error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="py-5 text-center">
+        <h2 th:text="#{page.addItem}">상품 등록 폼</h2>
+    </div>
+    <h4 class="mb-3" th:text="#{label.item}">상품 입력</h4>
+    <!-- 같은 url에서 method만 다를 경우 action에 경로를 생략할 수 있다. -->
+    <!-- 폼의 값이 서버로 전송될 때, 요소의 name으로 입력한 값이 넘어간다. -->
+    <form action="item.html" th:action th:object="${item}" method="post">
+
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메시지</p>
+        </div>
+
+        <div>
+            <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
+            <!-- th:field => 태그 속성 중 name, id, value를 자동으로 생성해준다.-->
+            <input type="text" id="itemName" th:field="*{itemName}"
+                   th:errorclass="field-error"
+                   class="form-control"
+                   th:placeholder="#{input.itemName}"
+                   placeholder="이름을 입력하세요">
+            <div class="field-error" th:errors="*{itemName}">
+                상품명 오류
+            </div>
+        </div>
+        <div>
+            <label for="price" th:text="#{label.item.price}">가격</label>
+            <input type="text" id="price" th:field="*{price}"
+                   th:errorclass="field-error"
+                   class="form-control"
+                   th:placeholder="#{input.price}"
+                   placeholder="가격을 입력하세요">
+            <div class="field-error" th:errors="*{price}">
+                가격 오류
+            </div>
+        </div>
+        <div>
+            <label for="quantity" th:text="#{label.item.quantity}">수량</label>
+            <input type="text" id="quantity" th:field="*{quantity}"
+                   th:errorclass="field-error"
+                   class="form-control"
+                   th:placeholder="#{input.quantity}"
+                   placeholder="수량을 입력하세요">
+            <div class="field-error" th:errors="*{quantity}">
+                수량 오류
+            </div>
+
+        </div>
+
+        <hr class="my-4">
+        <!-- single checkbox -->
+        <div th:text="#{label.item.check}">판매 여부</div>
+        <div>
+            <div class="form-check">
+                <input type="checkbox" id="open" th:field="*{open}" class="form-check-input">
+                <label for="open" th:text="#{item.check.open}" class="form-check-label">판매 오픈</label>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- multi checkbox -->
+        <div>
+            <div th:text="#{label.item.regions}">등록 지역</div>
+            <div th:each="region : ${regions}" class="form-check form-check-inline">
+                <input type="checkbox" th:field="*{regions}" th:value="${region.key}"
+                       class="form-check-input">
+                <label th:for="${#ids.prev('regions')}"
+                       th:text="${region.value}" class="form-check-label">서울</label>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- radio button -->
+        <div>
+            <div th:text="#{label.item.itemType}">상품 종류</div>
+            <div th:each="type : ${itemTypes}" class="form-check form-check-inline">
+                <!-- Enum.name() : enum의 이름 그대로를 반환한다. -->
+                <input type="radio" th:field="*{itemType}" th:value="${type.name()}"
+                       class="form-check-input">
+                <!-- Enum.description : Enum에 선언한 값 (도서, 음식, 기타)-->
+                <label th:for="${#ids.prev('itemType')}" th:text="${type.description}"
+                       class="form-check-label">
+                    BOOK
+                </label>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- SELECT -->
+        <div>
+            <div th:text="#{label.item.deliveryCode}">배송 방식</div>
+            <select th:field="*{deliveryCode}" class="form-select">
+                <option value="" th:text="#{item.deliveryCode}">==배송 방식 선택==</option>
+                <!-- deliveryCode : FAST, NORMAL, SLOW -->
+                <option th:each="deliveryCode : ${deliveryCodes}" th:value="${deliveryCode.code}"
+                        th:text="${deliveryCode.displayName}">FAST</option>
+            </select>
+        </div>
+        <hr class="my-4">
+
+        <div class="row">
+            <div class="col">
+                <button class="w-100 btn btn-primary btn-lg"
+                        th:text="#{button.save}"
+                        type="submit">상품 등록</button>
+            </div>
+            <div class="col">
+                <button class="w-100 btn btn-secondary btn-lg"
+                        onclick="location.href='items.html'"
+                        th:onclick="|location.href='@{/v4/items}'|"
+                        th:text="#{button.cancel}"
+                        type="button">취소</button>
+            </div>
+        </div>
+    </form>
+</div> <!-- /container -->
+</body>
+</html>
