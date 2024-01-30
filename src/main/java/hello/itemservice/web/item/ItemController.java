@@ -1,8 +1,8 @@
-package hello.itemservice.web.validation;
+package hello.itemservice.web.item;
 
 import hello.itemservice.domain.item.*;
-import hello.itemservice.web.validation.form.ItemSaveDto;
-import hello.itemservice.web.validation.form.ItemUpdateDto;
+import hello.itemservice.web.item.form.ItemSaveDto;
+import hello.itemservice.web.item.form.ItemUpdateDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -22,9 +22,9 @@ import java.util.Map;
  */
 @Slf4j
 @Controller
-@RequestMapping("/v4/items")
+@RequestMapping("/items")
 @RequiredArgsConstructor
-public class ItemControllerV4 {
+public class ItemController {
 
     private final ItemRepository itemRepository;
 
@@ -69,7 +69,7 @@ public class ItemControllerV4 {
         List<Item> items = itemRepository.findAll();
         model.addAttribute("items", items);
 
-        return "v4/items";
+        return "items/items";
     }
 
     //상품 상세 조회
@@ -81,7 +81,7 @@ public class ItemControllerV4 {
         Item item = itemRepository.findById(itemId); //id 값으로 item 객체 생성.
         model.addAttribute("item", item); //모델에 item 객체 저장.
 
-        return "v4/item";
+        return "items/item";
 
     }
 
@@ -94,7 +94,7 @@ public class ItemControllerV4 {
          */
         model.addAttribute("item", new Item()); // 빈 item 객체 저장.
 
-        return "v4/addForm";
+        return "items/addForm";
     }
 
     //상품 등록
@@ -105,7 +105,7 @@ public class ItemControllerV4 {
         //검증에 실패 -> 다시 입력 폼으로 이동.
         if(bindingResult.hasErrors()){
             log.info("errors = {} ", bindingResult);
-            return "v4/addForm";
+            return "items/addForm";
         }
 
         //Bean Validation- ObjectError 처리 방법 2 (직접 자바 코드로 작성 - 권장 O)
@@ -133,7 +133,7 @@ public class ItemControllerV4 {
 
         //새로 고침 문제를 해결하기 위해 상품 저장 후에 상품 상세 화면으로 리다이렉트를 호출.(GET으로 재호출)
         /* PRG Post/Redirect/Get 해결 방식 */
-        return "redirect:/v4/items/{itemId}";
+        return "redirect:/items/items/{itemId}";
     }
 
     //상품 수정 화면 출력
@@ -143,7 +143,7 @@ public class ItemControllerV4 {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
 
-        return "v4/editForm";
+        return "items/editForm";
     }
 
     //상품 수정
@@ -164,7 +164,7 @@ public class ItemControllerV4 {
         //검증에 실패 -> 다시 입력 폼으로 이동.
         if(bindingResult.hasErrors()){
             log.info("errors = {} ", bindingResult);
-            return "v4/editForm";
+            return "items/editForm";
         }
 
         //Dto를 가지고 item 객체 생성
@@ -176,8 +176,8 @@ public class ItemControllerV4 {
 
         itemRepository.update(itemId, item);
 
-        //redirect를 하면 /v4/items/{itemId}/edit 경로가 아닌 아래의 경로로 다시 재요청된다.
-        return "redirect:/v4/items/{itemId}"; //{itemId}값의 @PathVariable 값으로 들어간다.
+        //redirect를 하면 /items/items/{itemId}/edit 경로가 아닌 아래의 경로로 다시 재요청된다.
+        return "redirect:/items/items/{itemId}"; //{itemId}값의 @PathVariable 값으로 들어간다.
 
     }
 

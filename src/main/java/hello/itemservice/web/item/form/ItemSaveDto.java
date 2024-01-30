@@ -1,8 +1,6 @@
-package hello.itemservice.web.validation.form;
+package hello.itemservice.web.item.form;
 
 import hello.itemservice.domain.item.ItemType;
-import hello.itemservice.domain.item.SaveCheck;
-import hello.itemservice.domain.item.UpdateCheck;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
