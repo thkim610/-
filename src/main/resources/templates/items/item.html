@@ -95,14 +95,14 @@
         <div class="col">
             <button class="w-100 btn btn-primary btn-lg"
                     onclick="location.href='editForm.html'"
-                    th:onclick="|location.href='@{/v4/items/{itemId}/edit(itemId = ${item.id})}'|"
+                    th:onclick="|location.href='@{/items/{itemId}/edit(itemId = ${item.id})}'|"
                     th:text="#{page.updateItem}"
                     type="button">상품 수정</button>
         </div>
         <div class="col">
             <button class="w-100 btn btn-secondary btn-lg"
                     onclick="location.href='items.html'"
-                    th:onclick="|location.href='@{/v4/items}'|"
+                    th:onclick="|location.href='@{/items}'|"
                     th:text="#{page.items}"
                     type="button">목록으로</button>
         </div>
