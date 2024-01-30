@@ -1,4 +1,4 @@
-package hello.itemservice.web;
+package hello.itemservice.web.item;
 
 import hello.itemservice.domain.item.Item;
 import lombok.extern.slf4j.Slf4j;
