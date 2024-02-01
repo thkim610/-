@@ -35,8 +35,9 @@ public class MemberRepository {
 
     //로그인 id로 회원 찾기
     public Optional<Member>findByLoginId(String loginId){
-        List<Member> all = new ArrayList<>();
+        List<Member> all = new ArrayList<>(store.values());
 
+        //리스트에 저장된 member 객체들 중에서 입력받은 loginId와 비교하여 id와 일치하는 member 객체 반환.
         return all.stream().filter(m -> m.getLoginId().equals(loginId))
                 .findFirst();
     }
