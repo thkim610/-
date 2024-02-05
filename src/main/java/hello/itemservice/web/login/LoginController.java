@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -32,6 +33,7 @@ public class LoginController {
     //로그인
     @PostMapping("/login")
     public String login(@Valid @ModelAttribute("loginForm") LoginFormDto formDto, BindingResult bindingResult,
+                        @RequestParam(defaultValue = "/")String redirectURL,
                         HttpServletRequest request){
 
         log.info("login: formDto={}", formDto);
@@ -57,7 +59,8 @@ public class LoginController {
         //세션에 로그인 회원 정보를 보관.
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
 
-        return "redirect:/";
+        //로그인 시, 마지막에 있었던 페이지로 다시 이동.
+        return "redirect:" + redirectURL;
     }
 
     //로그아웃
