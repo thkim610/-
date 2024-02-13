@@ -2,6 +2,7 @@ package hello.itemservice;
 
 import hello.itemservice.web.filter.LoginCheckFilter;
 import hello.itemservice.web.interceptor.LogInterceptor;
+import hello.itemservice.web.interceptor.LoginCheckInterceptor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,12 @@ public class WebConfig implements WebMvcConfigurer {
                 .order(1) //인터셉터 체인: 첫번째 순서로 적용.
                 .addPathPatterns("/**") //모든 경로 인터셉터 허용.
                 .excludePathPatterns("/css/**", "/*.ico", "/error"); //해당 경로 인터셉터 제외.
+
+        registry.addInterceptor(new LoginCheckInterceptor())
+                .order(2) //인터셉터 체인: 두번째 순서로 적용.
+                .addPathPatterns("/**") //모든 경로 인터셉터 허용.
+                .excludePathPatterns("/css/**", "/*.ico", "/error",
+                        "/", "/members/add", "/login", "/logout"); //해당 경로 인터셉터 제외.
     }
 
     //@Bean
