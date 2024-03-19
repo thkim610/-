@@ -131,9 +131,10 @@ public class ItemController {
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true); // 저장이 완료되었을 때 상태
 
+        log.info("item = {} ", savedItem);
         //새로 고침 문제를 해결하기 위해 상품 저장 후에 상품 상세 화면으로 리다이렉트를 호출.(GET으로 재호출)
         /* PRG Post/Redirect/Get 해결 방식 */
-        return "redirect:/items/items/{itemId}";
+        return "redirect:/items/{itemId}";
     }
 
     //상품 수정 화면 출력
@@ -177,7 +178,7 @@ public class ItemController {
         itemRepository.update(itemId, item);
 
         //redirect를 하면 /items/items/{itemId}/edit 경로가 아닌 아래의 경로로 다시 재요청된다.
-        return "redirect:/items/items/{itemId}"; //{itemId}값의 @PathVariable 값으로 들어간다.
+        return "redirect:/items/{itemId}"; //{itemId}값의 @PathVariable 값으로 들어간다.
 
     }
 
