@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * 사용자로부터 업로드 된 파일을 서버에 저장하고 관리를 용이하게 하기 위해
@@ -23,8 +25,47 @@ public class FileStore {
     }
 
     //여러개 파일 저장
-    public List<UploadFile> storeFiles(List<MultipartFile> imageFiles){
 
+    //파일 저장
+    public UploadFile storeFile(MultipartFile multipartFile) throws IOException {
+        //파일이 없으면 null 반환.
+        if(multipartFile.isEmpty()){
+            return null;
+        }
+
+        //파일명을 고유의 파일명으로 변환하여 서버 내부에 저장.
+        //1. 파일명 추출
+        String originalFileName = multipartFile.getOriginalFilename();
+
+        //2. 고유파일명으로 변환.
+        String storeFileName = createStoreFileName(originalFileName);
+
+        //3. 파일 저장.
+        multipartFile.transferTo(new File(getFileDir(storeFileName)));
+
+        //4. 엔터티 반환.
+        return new UploadFile(originalFileName, storeFileName);
+
+
+    }
+
+    private String createStoreFileName(String originalFilename) {
+        //2. 파일명에서 확장자 추출.
+        String ext = extractExt(originalFilename);
+
+        //3. 서버 내부에 저장할 파일명으로 변환. UUID 사용
+        String uuid = UUID.randomUUID().toString();
+        String storeFileName = uuid + "." + ext;
+
+        return storeFileName;
+    }
+
+    private String extractExt(String originalFilename) {
+
+        int position = originalFilename.lastIndexOf(".");
+        String ext = originalFilename.substring(position+1); //"."이후의 확장자 추출
+
+        return ext;
     }
 
     //서버 내부에서 관리할 파일명으로 변환하는 메서드 (uuid 사용)
