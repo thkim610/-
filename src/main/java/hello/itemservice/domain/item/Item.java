@@ -46,7 +46,7 @@ public class Item {
     private String deliveryCode; // 배송 방식
 
     private UploadFile attachFile;
-    private List<UploadFile> imagefiles;
+    private List<UploadFile> imageFiles;
 
     public Item() {
     }
