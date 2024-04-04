@@ -3,6 +3,7 @@ package hello.itemservice.web.item.form;
 import hello.itemservice.domain.item.ItemType;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
@@ -27,6 +28,9 @@ public class ItemSaveDto {
     private List<String> regions; // 등록 지역
     private ItemType itemType; // 상품 종류
     private String deliveryCode; // 배송 방식
+
+    private List<MultipartFile> imageFiles; //상품 이미지 파일들
+
 
 
 
