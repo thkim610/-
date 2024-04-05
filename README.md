@@ -55,12 +55,8 @@
 
 | 컬럼명 | 데이터 타입 | 설명 |
 | --- | --- | --- |
-| code | String | - FAST 
-- NOMAL
-- SLOW |
-| displayName | String | - 빠른 배송(Fast)
-- 보통 배송(Normal)
-- 느린 배송(Slow) |
+| code | String | FAST / NOMAL / SLOW |
+| displayName | String | 빠른 배송(Fast) /보통 배송(Normal) /느린 배송(Slow) |
 
 ### 상품 종류 도메인 (ENUM)
 
