@@ -1,5 +1,6 @@
 package hello.itemservice.web.item;
 
+import hello.itemservice.domain.file.FileStore;
 import hello.itemservice.domain.item.*;
 import hello.itemservice.web.item.form.ItemSaveDto;
 import hello.itemservice.web.item.form.ItemUpdateDto;
@@ -12,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.Map;
 public class ItemController {
 
     private final ItemRepository itemRepository;
+    private final FileStore fileStore;
 
     /**
      * 성능 측면에서 static 클래스로 따로 분리 해보기!!
@@ -100,7 +103,8 @@ public class ItemController {
     //상품 등록
     //BeanValidation groups(SaveCheck) : 등록 검증만 적용.
     @PostMapping("/add")
-    public String save(@Validated @ModelAttribute("item") ItemSaveDto itemSaveDto, BindingResult bindingResult, RedirectAttributes redirectAttributes){
+    public String save(@Validated @ModelAttribute("item") ItemSaveDto itemSaveDto, BindingResult bindingResult,
+                       RedirectAttributes redirectAttributes) throws IOException {
 
         //검증에 실패 -> 다시 입력 폼으로 이동.
         if(bindingResult.hasErrors()){
@@ -119,12 +123,17 @@ public class ItemController {
             }
         }
 
+
         //검증 성공 로직
+        //업로드 파일(상품이미지) 저장
+        List<UploadFile> imageFiles = fileStore.storeFiles(itemSaveDto.getImageFiles());
+
         //Dto를 가지고 item 객체 생성
         Item item = new Item();
         item.setItemName(itemSaveDto.getItemName());
         item.setPrice(itemSaveDto.getPrice());
         item.setQuantity(itemSaveDto.getQuantity());
+        item.setImageFiles(imageFiles);
 
         Item savedItem = itemRepository.save(item);
 
