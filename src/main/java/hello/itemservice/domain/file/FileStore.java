@@ -7,6 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -25,6 +27,17 @@ public class FileStore {
     }
 
     //여러개 파일 저장
+    public List<UploadFile> storeFiles(List<MultipartFile> multipartFiles) throws IOException {
+        //업로드 파일이 계속 생성되면 그것들을 담을 리스트가 필요.
+        List<UploadFile> storeFileResult = new ArrayList<>();
+        for (MultipartFile multipartFile : multipartFiles) {
+            if(!multipartFile.isEmpty()){
+                storeFileResult.add(storeFile(multipartFile));
+            }
+        }
+
+        return storeFileResult;
+    }
 
     //파일 저장
     public UploadFile storeFile(MultipartFile multipartFile) throws IOException {
