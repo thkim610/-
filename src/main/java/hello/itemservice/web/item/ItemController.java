@@ -6,6 +6,8 @@ import hello.itemservice.web.item.form.ItemSaveDto;
 import hello.itemservice.web.item.form.ItemUpdateDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -145,6 +148,19 @@ public class ItemController {
         /* PRG Post/Redirect/Get 해결 방식 */
         return "redirect:/items/{itemId}";
     }
+
+    //서버에 저장된 이미지 불러오기
+    @ResponseBody
+    @GetMapping("/images/{filename}")
+    public Resource downloadImage(@PathVariable String filename) throws MalformedURLException {
+        log.info("filename={}",filename);
+        //"file:/Users/../uuid파일명"
+        //file: ~로 시작하게 되면 이 파일에 직접 접근하여 리소스를 가져오고 스트림이 되어 화면으로 뿌려주게 된다.
+        return new UrlResource("file:" + fileStore.getFullPath(filename));
+
+        //-> 이 메서드는 보안에 취약하므로 체크 로직을 추가하여 보안을 강화해야 함.
+    }
+
 
     //상품 수정 화면 출력
     @GetMapping("/{itemId}/edit") // GET 경로에 있는 변수명과 @PathVariable의 변수명이 같아야 함.

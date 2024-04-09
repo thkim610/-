@@ -22,7 +22,7 @@ public class FileStore {
     private String fileDir; // 파일을 저장할 경로
 
     //파일명을 받아서 해당 파일이 저장된 풀 경로를 반환.
-    public String getFileDir(String fileName){
+    public String getFullPath(String fileName){
         return fileDir + fileName;
     }
 
@@ -54,7 +54,7 @@ public class FileStore {
         String storeFileName = createStoreFileName(originalFileName);
 
         //3. 파일 저장.
-        multipartFile.transferTo(new File(getFileDir(storeFileName)));
+        multipartFile.transferTo(new File(getFullPath(storeFileName)));
 
         //4. 엔터티 반환.
         return new UploadFile(originalFileName, storeFileName);
