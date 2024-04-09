@@ -91,6 +91,13 @@
     </div>
     <hr class="my-4">
 
+    <div class="text-center">
+        <!-- 상품 이미지를 띄우기 위한 img 태그 추가 -->
+        <img th:each="imageFile : ${item.imageFiles}" th:src="|/images/${imageFile.getStoreFileName()}|" alt="상품 이미지" class="img-fluid" style="max-width: 200px; height: auto;">
+        <!-- 이미지가 없을 경우 표시할 기본 이미지 -->
+        <!--<img th:unless="${item.image}" src="/images/no-image.png" alt="이미지 없음" class="img-fluid" style="max-width: 200px; height: auto;">-->
+    </div>
+
     <div class="row">
         <div class="col">
             <button class="w-100 btn btn-primary btn-lg"
